@@ -120,13 +120,10 @@ alter table order_items_dataset add foreign key (seller_id) references sellers_d
 ```
 </details>
 
-**Hasil ERD:** <br>
-<p align="center">
-![image](https://github.com/arllarima/Analyzing-eCommerce-Business-Performance-with-SQL/assets/130117653/d105e9cf-3b55-4578-be82-a85d5b1d77df)<br>
-Gambar 1. Entity Relationship Diagram
-</p>
-<br>
-<br>
+## Data Analysis
+## 1. Annual Customer Activity Growth
+Pertumbuhan aktivitas customer tahunan dapat dianalisis dari Monthly active user (MAU) atau rata-rata customer aktif bulanan, customer baru, customer dengan repeat order, dan rata-rata order oleh customer.
+
 
 
 
