@@ -125,7 +125,6 @@ alter table order_items_dataset add foreign key (seller_id) references sellers_d
   <kbd><img src="additional/ERD.png" width=600px> </kbd> <br>
   Gambar 1. Entity Relationship Diagram
 </p>
-<br>
 
 ## Data Analysis
 ## 1. Annual Customer Activity Growth
@@ -279,21 +278,146 @@ Tabel 1. Hasil Analisis Pertumbuhan Aktivitas Pelanggan Tahunan  <br>
 </p>
 
 Secara keseluruhan perusahaan mengalami peningkakatan Customer Aktif Bulanan serta customer baru setiap tahunnya. Peningkatan yang signifikan terjadi pada tahun 2016 ke 2017, hal ini dikarenakan data transaksi pada tahun 2016 dimulai pada bulan September. <br>
-<br>
+
 <p align="center">
   <kbd><img src="additional/cust repeat order.jpg" width=600px> </kbd> <br>
   Gambar 3. Grafik Jumlah Pelanggan yang Melakukan Repeat Order
 </p>
 
 Peningkatan yang signifikan juga terjadi pada jumlah customer yang melakukan repeat order pada tahun 2016 hingga 2017. Namun pada tahun 2018 mengalami sedikit penurunan. <br>
-<br>
 
 <p align="center">
   <kbd><img src="additional/rata2 frekuensi order.jpg" width=600px> </kbd> <br>
   Gambar 4. Grafik Rata-rata Frekuensi Order Pelanggan
 </p>
 
-Berdasarkan hasil grafik diatas, diketahui bahwa rata-rata customer setiap tahunnya cenderung hanya melakukan order satu kali, artinya mayoritas customer tidak melakukan repeat order.
+Berdasarkan hasil grafik diatas, diketahui bahwa rata-rata customer setiap tahunnya cenderung hanya melakukan order satu kali, artinya mayoritas customer tidak melakukan repeat order. <br>
+
+## 2. Annual Product Category Quality
+Kualitas kategori produk tahunan dapat dianalisis dari total pendapatan, total pembatalan pesanan, kategori top produk dan kategori produk yang paling banyak dibatalkan.
+
+<details>
+  <summary>Click untuk melihat Queries</summary>
+
+  ```sql
+-- 1. Membuat tabel yang berisi informasi pendapatan/revenue perusahaan total untuk masing-masing tahun
+create table total_revenue as
+		select
+			  date_part('year', od.order_purchase_timestamp) as tahun,
+			  sum(oid.price + oid.freight_value) as revenue
+		from order_items_dataset as oid
+		join orders_dataset as od on oid.order_id = od.order_id
+		where od.order_status = 'delivered'
+		group by 1
+		order by 1;
+		
+-- 2. Membuat tabel yang berisi informasi jumlah cancel order total untuk masing-masing tahun
+create table cancelled_order as
+		select
+			  date_part('year', order_purchase_timestamp) as tahun,
+			  count(order_id) as total_cancel
+		from orders_dataset
+		where order_status = 'canceled'
+		group by 1
+		order by 1;
+		
+-- 3. Membuat tabel yang berisi nama kategori produk yang memberikan pendapatan total tertinggi untuk masing-masing tahun
+create table top_product_category as
+		select
+			   tahun,
+			   kategori_produk,
+			   revenue
+		from (
+			  select 
+					date_part('year', od.order_purchase_timestamp) as tahun,
+					pd.product_category_name as kategori_produk,
+					sum(oid.price + oid.freight_value) as revenue,
+					rank() over(partition by
+											date_part('year', od.order_purchase_timestamp) 
+									order by 
+											sum(oid.price + oid.freight_value) desc) as ranking
+			  from order_items_dataset as oid
+			  join orders_dataset as od on od.order_id = oid.order_id
+			  join product_dataset as pd on pd.product_id = oid.product_id
+		   	  where od.order_status = 'delivered'
+			  group by 1,2
+			  order by 1
+			  ) subq
+		where ranking = 1;
+		
+-- 4. Membuat tabel yang berisi nama kategori produk yang memiliki jumlah cancel order terbanyak untuk masing-masing tahun
+create table top_cancelled_product as
+		select
+			   tahun,
+			   kategori_produk,
+			   total_cancel
+		from (
+			  select 
+					date_part('year', od.order_purchase_timestamp) as tahun,
+					pd.product_category_name as kategori_produk,
+					count(od.order_id) as total_cancel,
+					rank() over(partition by
+						     date_part('year', od.order_purchase_timestamp) 
+					          order by 
+			                             count(od.order_id) desc) as ranking
+			  from order_items_dataset as oid
+			  join orders_dataset as od on od.order_id = oid.order_id
+			  join product_dataset as pd on pd.product_id = oid.product_id
+		   	  where od.order_status = 'canceled'
+			  group by 1,2
+			  order by 1
+			  ) subq
+		where ranking = 1;
+		
+-- 5. Menggabungkan informasi-informasi yang telah didapatkan ke dalam satu tampilan tabel
+select 
+        tr.tahun as year,
+		round(tr.revenue::numeric, 2) as total_revenue,
+		tpc.kategori_produk as top_category_product,
+		round(tpc.revenue::numeric, 2) as total_revenue_top_product,
+		co.total_cancel,
+		tcp.kategori_produk AS top_canceled_product,
+		tcp.total_cancel AS total_top_canceled_product
+from total_revenue as tr
+join
+	top_product_category as tpc on tr.tahun = tpc.tahun
+join
+	cancelled_order as co on tpc.tahun = co.tahun
+join
+	top_cancelled_product as tcp on co.tahun = tcp.tahun;
+```
+</details>
+
+<p align="center">
+Tabel 2. Hasil Analisis Total Kategori Produk Tahunan <br>
+  <kbd><img src="additional/Hasil Annual Product Category Quality.png" width=600px> </kbd> <br>
+</p>
+
+<br>
+<p align="center">
+  <kbd><img src="additional/total revenue pertahun.jpg" width=600px> </kbd> <br>
+  Gambar 5. Grafik Total Revenue Pertahun
+</p>
+
+Secara keseluruhan revenue perusahaan meningkat setiap tahun. <br>
+
+<p align="center">
+  <kbd><img src="additional/top revenue produk pertahun.jpg" width=600px> </kbd> <br>
+  Gambar 6. Grafik Total Revenue Top Produk Pertahun
+</p>
+
+Penjualan kategori top produk juga meningkat setiap tahunnya. Selain itu, setiap tahunnya terdapat kategori top produk yang berbeda. Pada tahun 2018, perusahaan meraih penjualan tertinggi pada produk kesehatan dan kecantikan (health_beauty). <br>
+
+<p align="center">
+  <kbd><img src="additional/total produk dibatalkan.jpg" width=600px> </kbd> <br>
+  Gambar 7. Grafik Total Top Produk yang Dibatalkan Pertahun
+</p>
+
+Selain itu, produk yang sering dibatalkan pelanggan setiap tahunnya memiliki kategori yang berbeda dan terus meningkat. Pada tahun 2018 jumlah produk yang dibatalkan tertinggi berada dalam kategori yang sama dengan produk terlaris. Hal ini diduga karena kategori kesehatan dan kecantikan sedang mendominasi pasar.
+
+
+
+
 
 
 
