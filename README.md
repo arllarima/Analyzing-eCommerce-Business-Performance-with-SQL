@@ -126,7 +126,6 @@ alter table order_items_dataset add foreign key (seller_id) references sellers_d
   Gambar 1. Entity Relationship Diagram
 </p>
 <br>
-<br>
 
 ## Data Analysis
 ## 1. Annual Customer Activity Growth
@@ -275,14 +274,14 @@ Tabel 1. Hasil Analisis Pertumbuhan Aktivitas Pelanggan Tahunan  <br>
 
 <br>
 <p align="center">
-  <kbd><img src="additional/Rata2 MAU.png" width=600px> </kbd> <br>
+  <kbd><img src="additional/Rata2 MAU.jpg" width=600px> </kbd> <br>
   Gambar 2. Grafik Rata-rata MAU dan Pelanggan Baru
 </p>
 
 Secara keseluruhan perusahaan mengalami peningkakatan Customer Aktif Bulanan serta customer baru setiap tahunnya. Peningkatan yang signifikan terjadi pada tahun 2016 ke 2017, hal ini dikarenakan data transaksi pada tahun 2016 dimulai pada bulan September. <br>
 <br>
 <p align="center">
-  <kbd><img src="additional/cust repeat order" width=600px> </kbd> <br>
+  <kbd><img src="additional/cust repeat order.jpg" width=600px> </kbd> <br>
   Gambar 3. Grafik Jumlah Pelanggan yang Melakukan Repeat Order
 </p>
 
@@ -290,7 +289,7 @@ Peningkatan yang signifikan juga terjadi pada jumlah customer yang melakukan rep
 <br>
 
 <p align="center">
-  <kbd><img src="additional/rata2 frekuensi order" width=600px> </kbd> <br>
+  <kbd><img src="additional/rata2 frekuensi order.jpg" width=600px> </kbd> <br>
   Gambar 4. Grafik Rata-rata Frekuensi Order Pelanggan
 </p>
 
