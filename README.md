@@ -413,8 +413,60 @@ Penjualan kategori top produk juga meningkat setiap tahunnya. Selain itu, setiap
   Gambar 7. Grafik Total Top Produk yang Dibatalkan Pertahun
 </p>
 
-Selain itu, produk yang sering dibatalkan pelanggan setiap tahunnya memiliki kategori yang berbeda dan terus meningkat. Pada tahun 2018 jumlah produk yang dibatalkan tertinggi berada dalam kategori yang sama dengan produk terlaris. Hal ini diduga karena kategori kesehatan dan kecantikan sedang mendominasi pasar.
+Selain itu, produk yang sering dibatalkan pelanggan setiap tahunnya memiliki kategori yang berbeda dan terus meningkat. Pada tahun 2018 jumlah produk yang dibatalkan tertinggi berada dalam kategori yang sama dengan produk terlaris. Hal ini diduga karena kategori kesehatan dan kecantikan sedang mendominasi pasar. <br>
 
+## 3. Annual Payment Type Usage
+Tipe pembayaran yang digunakan pelanggan dapat dianalisis dari jenis pembayaran favorit dan jumlah penggunaan untuk setiap jenis pembayaran pertahun. <br>
+
+<details>
+  <summary>Click untuk melihat Queries</summary>
+
+  ```sql
+-- 1. Menampilkan jumlah penggunaan masing-masing tipe pembayaran secara all time diurutkan dari yang terfavorit
+select payment_type, count(1) as jumlah
+from order_payments_dataset
+group by 1
+order by 2 desc;
+
+-- 2. Menampilkan detail informasi jumlah penggunaan masing-masing tipe pembayaran untuk setiap tahun
+select
+	payment_type,
+	sum(case when tahun = 2016 then total else 0 end) as "2016",
+	sum(case when tahun = 2017 then total else 0 end) as "2017",
+	sum(case when tahun = 2018 then total else 0 end) as "2018",
+	sum(total) as total_payment_type_usage
+from (
+	select 
+		date_part('year', od.order_purchase_timestamp) as tahun,
+		opd.payment_type,
+		count(opd.payment_type) as total
+	from orders_dataset as od
+	join order_payments_dataset as opd 
+		on od.order_id = opd.order_id
+	group by 1, 2
+	) as sub
+group by 1
+order by 2 desc;
+```
+</details>
+
+<p align="center">
+Tabel 3. Hasil Analisis Tipe Pembayaran yang Digunakan Pelanggan <br>
+  <kbd><img src="additional/Hasil Annual Payment Type Usage.jpg" width=600px> </kbd> <br>
+</p>
+
+<br>
+<p align="center">
+  <kbd><img src="additional/tipe pembayaran pertahun.jpg" width=600px> </kbd> <br>
+  Gambar 8. Grafik Tipe Pembayaran yang Digunakan Pelanggan Pertahun
+</p>
+
+- Mayoritas pelanggan membayar dengan kartu kredit dan jumlahnya terus meningkat setiap tahun. Pembayaran dengan voucher meningkat pada tahun 2017 tetapi menurun pada tahun 2018. Hal ini diperkirakan karena  lebih sedikit voucher yang diterbitkan oleh perusahaan dibandingkan tahun sebelumnya. <br>
+
+- Di sisi lain, jumlah pelanggan yang membayar dengan kartu debit meningkat secara signifikan di tahun 2018. Hal ini diduga karena kartu debit dapat memiliki diskon pembayaran sehingga banyak pelanggan yang tertarik dengan cara ini.  <br>
+
+- Mayoritas pelanggan membayar dengan kartu kredit dan jumlahnya terus meningkat setiap tahun.
+Di sisi lain, jumlah pelanggan yang membayar dengan kartu bank meningkat secara signifikan di tahun 2018.
 
 
 
