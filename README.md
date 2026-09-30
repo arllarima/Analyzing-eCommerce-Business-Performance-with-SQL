@@ -19,7 +19,7 @@ The dataset contains all orders from an e-commerce company from 2016 to 2018. It
 4. Create and export an ERD (Entity Relationship Diagram). <br>
 
 <details>
-  <summary>Click untuk melihat Queries</summary>
+  <summary>Click to view queries</summary>
   
   ``` sql
   -- 1. Create tabel
@@ -120,7 +120,7 @@ alter table order_items_dataset add foreign key (seller_id) references sellers_d
 ```
 </details>
 
-**Hasil ERD :** <br>
+**ERD Result :** <br>
 <p align="center">
   <kbd><img src="additional/ERD.png" width=600px> </kbd> <br>
   Picture 1. Entity Relationship Diagram
@@ -131,7 +131,7 @@ alter table order_items_dataset add foreign key (seller_id) references sellers_d
 Annual customer activity can be analyzed using several metrics, including Monthly Active Users (MAU), new customers, repeat customers, and the average number of orders per customer.
 
 <details>
-  <summary>Click untuk melihat Queries</summary>
+  <summary>Click to view queries</summary>
 
   ```sql
 -- 1. Average number of monthly active users per year
@@ -297,7 +297,7 @@ Based on the chart above, customers generally made only one order per year on av
 The annual performance of product categories can be analyzed using total revenue, total canceled orders, the top-selling product category, and the category with the most canceled orders.
 
 <details>
-  <summary>Click untuk melihat Queries</summary>
+  <summary>Click to view queries</summary>
 
   ```sql
 -- 1. Create a table showing total company revenue for each year
@@ -419,7 +419,7 @@ The category with the most canceled orders also varied each year and showed an o
 Customer payment preferences can be analyzed by looking at the most frequently used payment methods and the number of transactions for each method each year. <br>
 
 <details>
-  <summary>Click untuk melihat Queries</summary>
+  <summary>Click to view queries</summary>
 
   ```sql
 -- 1. Displays the total usage count for each payment type (all-time), sorted by popularity
