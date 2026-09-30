@@ -1,28 +1,28 @@
 # Analyzing-eCommerce-Business-Performance-with-SQL
-Project ini dibuat untuk menganalisis kasus performansi bisnis eCommerce.<br>
-**Dataset** : Disediakan oleh Rakamin Academy <br>
+This project was created to analyze the business performance of an e-commerce company.<br>
+**Dataset** : Provided by Rakamin Academy <br>
 **Tools** : PostgreSQL <br>
 **Visualization** : Google Data Studio <br>
 
 ## Overview
-Dalam suatu perusahaan, mengukur performa bisnis sangatlah penting untuk melacak, memantau, dan menilai keberhasilan atau kegagalan dari berbagai proses bisnis. Oleh karena itu, dalam project ini akan menganalisa performa bisnis untuk sebuah perusahan eCommerce,  dengan memperhitungkan beberapa metrik bisnis yaitu: <br>
+For any company, measuring business performance is important to track and evaluate the success of different business processes. Therefore, this project analyzes the performance of an e-commerce company using several key metrics: <br>
 1. Annual Customer Activity Growth <br>
 2. Annual Product Category Quality <br>
 3. Annual Payment Type Usage <br>
 
 ## Data Preparation
-Sebelum memulai pemrosesan data, tahap paling awal yang harus dilakukan adalah mempersiapkan data mentah menjadi data yang terstruktur dan siap diolah. <br>
-Dataset yang digunakan adalah dataset semua pemesanan dari sebuah perusahaan e-Commerce dari tahun 2016 – 2018. Di dalam dataset ini terdapat 8 tabel yang berinteraksi satu sama lain. Maka langkah-langkah yang dilakukan selanjutnya adalah sebagai berikut: <br>
-1. Buat database baru beserta tabel-tabelnya untuk data yang sudah disiapkan, dengan memperhatikan tipe data masing-masing kolom. <br>
-2. Impor data CSV ke database. <br>
-3. Menentukan Primary Key dan Foreign Key dengan alter table. <br>
-4. Membuat dan mengeksport ERD (Entity Relationship Diagram). <br>
+Before processing the data, the raw data needs to be prepared and organized into a structured format. <br>
+The dataset contains all orders from an e-commerce company from 2016 to 2018. It consists of eight related tables. The data preparation process includes the following steps: <br>
+1. Create a new database and tables for the prepared data, with the correct data type for each column. <br>
+2. Import the CSV files into the database. <br>
+3. Define the Primary Keys and Foreign Keys using the `ALTER TABLE` command. <br>
+4. Create and export an ERD (Entity Relationship Diagram). <br>
 
 <details>
   <summary>Click untuk melihat Queries</summary>
   
   ``` sql
-  -- 1. Membuat tabel
+  -- 1. Create tabel
 CREATE TABLE customers_dataset (
 	customer_id varchar,
 	customer_unique_id varchar,
@@ -98,10 +98,10 @@ CREATE TABLE order_reviews_dataset (
 	review_answer_timestamp timestamp
 	);
 	
--- 2. Menginput isi tabel dengan file csv, klik kanan pada nama tabel > Import/Export Data
+-- 2. Import the CSV data into the table by right-clicking the table name > Import/Export Data
 
 
--- 3. Menentukan Primary Key dan Foreign Key
+-- 3. Define Primary Keys and Foreign Keys
 -- Primary Key
 alter table customers_dataset add primary key(customer_id);
 alter table sellers_dataset add primary key(seller_id);
@@ -116,25 +116,25 @@ alter table order_items_dataset add foreign key (order_id) references orders_dat
 alter table order_items_dataset add foreign key (product_id) references product_dataset;
 alter table order_items_dataset add foreign key (seller_id) references sellers_dataset;
 
--- 4. Membuat ERD dengan cara klik kanan pada database ecommerce > Generate ERD
+-- 4. Create an ERD by right-clicking on ecommerce database > Generate ERD
 ```
 </details>
 
 **Hasil ERD :** <br>
 <p align="center">
   <kbd><img src="additional/ERD.png" width=600px> </kbd> <br>
-  Gambar 1. Entity Relationship Diagram
+  Picture 1. Entity Relationship Diagram
 </p>
 
 ## Data Analysis
 ## 1. Annual Customer Activity Growth
-Pertumbuhan aktivitas customer tahunan dapat dianalisis dari Monthly active user (MAU) atau rata-rata customer aktif bulanan, customer baru, customer dengan repeat order, dan rata-rata order oleh customer.
+Annual customer activity can be analyzed using several metrics, including Monthly Active Users (MAU), new customers, repeat customers, and the average number of orders per customer.
 
 <details>
   <summary>Click untuk melihat Queries</summary>
 
   ```sql
--- 1. rata-rata jumlah customer aktif bulanan (monthly active user) untuk setiap tahun
+-- 1. Average number of monthly active users per year
 select tahun, round(avg(total_customer)) as rata2_customer_aktif
 from (
 	  select date_part('year', od.order_purchase_timestamp) as tahun,
@@ -148,7 +148,7 @@ from (
 group by 1
 order by 1;
 
--- 2. Jumlah customer baru pada masing-masing tahun
+-- 2. Number of new customers per year
 select tahun, count(customer_unique_id) as total_customer_baru
 from (
 	   select min(date_part('year', od.order_purchase_timestamp)) as tahun,
@@ -161,7 +161,7 @@ from (
 group by 1
 order by 1;
 
--- 3. jumlah customer yang melakukan pembelian lebih dari satu kali (repeat order) pada masing-masing tahun
+-- 3. Number of customers who made repeat purchases per year
 select tahun, count(customer_unique_id) as total_cust_repeat_order
 from (
 	  select date_part('year', od.order_purchase_timestamp) as tahun,
@@ -176,7 +176,7 @@ from (
 group by 1
 order by 1;
 
--- 4. rata-rata jumlah order yang dilakukan customer untuk masing-masing tahun
+-- 4. Average number of orders placed by customers per year
 select tahun, round(avg(total_order), 2) as rata2_frekuensi_order
 from (
 	  select date_part('year', od.order_purchase_timestamp) as tahun,
@@ -190,7 +190,7 @@ from (
 group by 1
 order by 1;
 
--- 5. Menggabungkan ketiga metrik yang telah berhasil ditampilkan menjadi satu tampilan tabel
+-- 5. Combining the three metrics into a single table view
 with tbl_mau as (
 		    select tahun, round(avg(total_customer)) as rata2_customer_aktif
 		    from (
@@ -267,40 +267,40 @@ order by 1;
 </details>
 
 <p align="center">
-Tabel 1. Hasil Analisis Pertumbuhan Aktivitas Pelanggan Tahunan  <br>
+Tabel 1. Analysis Results of Annual Customer Activity Growth <br>
   <kbd><img src="additional/Hasil Annual Customer Activity Growth.png" width=600px> </kbd> <br>
 </p>
 
 <br>
 <p align="center">
   <kbd><img src="additional/Rata2 MAU.jpg" width=600px> </kbd> <br>
-  Gambar 2. Grafik Rata-rata MAU dan Pelanggan Baru
+  Picture 2. Chart of Average MAUs and New Subscribers
 </p>
 
-Secara keseluruhan perusahaan mengalami peningkakatan Customer Aktif Bulanan serta customer baru setiap tahunnya. Peningkatan yang signifikan terjadi pada tahun 2016 ke 2017, hal ini dikarenakan data transaksi pada tahun 2016 dimulai pada bulan September. <br>
+Overall, the company experienced an increase in both monthly active customers and new customers each year. The most significant increase occurred from 2016 to 2017. This was partly because the 2016 transaction data only covered the period from September to December. <br>
 
 <p align="center">
   <kbd><img src="additional/cust repeat order.jpg" width=600px> </kbd> <br>
-  Gambar 3. Grafik Jumlah Pelanggan yang Melakukan Repeat Order
+  Picture 3. Chart of the Number of Customers Placing Repeat Orders
 </p>
 
-Peningkatan yang signifikan juga terjadi pada jumlah customer yang melakukan repeat order pada tahun 2016 hingga 2017. Namun pada tahun 2018 mengalami sedikit penurunan. <br>
+The number of customers who made repeat orders also increased significantly from 2016 to 2017. However, it decreased slightly in 2018. <br>
 
 <p align="center">
   <kbd><img src="additional/rata2 frekuensi order.jpg" width=600px> </kbd> <br>
-  Gambar 4. Grafik Rata-rata Frekuensi Order Pelanggan
+  Picture 4. Chart of Average Customer Order Frequency
 </p>
 
-Berdasarkan hasil grafik diatas, diketahui bahwa rata-rata customer setiap tahunnya cenderung hanya melakukan order satu kali, artinya mayoritas customer tidak melakukan repeat order. <br>
+Based on the chart above, customers generally made only one order per year on average. This indicates that most customers did not make repeat purchases. <br>
 
 ## 2. Annual Product Category Quality
-Kualitas kategori produk tahunan dapat dianalisis dari total pendapatan, total pembatalan pesanan, kategori top produk dan kategori produk yang paling banyak dibatalkan.
+The annual performance of product categories can be analyzed using total revenue, total canceled orders, the top-selling product category, and the category with the most canceled orders.
 
 <details>
   <summary>Click untuk melihat Queries</summary>
 
   ```sql
--- 1. Membuat tabel yang berisi informasi pendapatan/revenue perusahaan total untuk masing-masing tahun
+-- 1. Create a table showing total company revenue for each year
 create table total_revenue as
 		select
 			  date_part('year', od.order_purchase_timestamp) as tahun,
@@ -311,7 +311,7 @@ create table total_revenue as
 		group by 1
 		order by 1;
 		
--- 2. Membuat tabel yang berisi informasi jumlah cancel order total untuk masing-masing tahun
+-- 2. Create a table showing the total number of cancelled orders for each year
 create table cancelled_order as
 		select
 			  date_part('year', order_purchase_timestamp) as tahun,
@@ -321,7 +321,7 @@ create table cancelled_order as
 		group by 1
 		order by 1;
 		
--- 3. Membuat tabel yang berisi nama kategori produk yang memberikan pendapatan total tertinggi untuk masing-masing tahun
+-- 3. Create a table showing the product category that generated the highest total revenue for each year
 create table top_product_category as
 		select
 			   tahun,
@@ -345,7 +345,7 @@ create table top_product_category as
 			  ) subq
 		where ranking = 1;
 		
--- 4. Membuat tabel yang berisi nama kategori produk yang memiliki jumlah cancel order terbanyak untuk masing-masing tahun
+-- 4. Create a table showing the product category with the highest number of cancelled orders for each year
 create table top_cancelled_product as
 		select
 			   tahun,
@@ -369,7 +369,7 @@ create table top_cancelled_product as
 			  ) subq
 		where ranking = 1;
 		
--- 5. Menggabungkan informasi-informasi yang telah didapatkan ke dalam satu tampilan tabel
+-- 5. Combine the gathered information into a single table view
 select 
         tr.tahun as year,
 		round(tr.revenue::numeric, 2) as total_revenue,
@@ -389,46 +389,46 @@ join
 </details>
 
 <p align="center">
-Tabel 2. Hasil Analisis Total Kategori Produk Tahunan <br>
+Tabel 2. Analysis Results of Total Annual Product Categories <br>
   <kbd><img src="additional/Hasil Annual Product Category Quality.png" width=600px> </kbd> <br>
 </p>
 
 <br>
 <p align="center">
   <kbd><img src="additional/total revenue pertahun.jpg" width=600px> </kbd> <br>
-  Gambar 5. Grafik Total Revenue Pertahun
+  Picture 5. Annual Total Revenue Chart
 </p>
 
-Secara keseluruhan revenue perusahaan meningkat setiap tahun. <br>
+Overall the company's revenue increases every year. <br>
 
 <p align="center">
   <kbd><img src="additional/top revenue produk pertahun.jpg" width=600px> </kbd> <br>
-  Gambar 6. Grafik Total Revenue Top Produk Pertahun
+  Picture 6. Chart of Total Revenue by Top Products per Year
 </p>
 
-Penjualan kategori top produk juga meningkat setiap tahunnya. Selain itu, setiap tahunnya terdapat kategori top produk yang berbeda. Pada tahun 2018, perusahaan meraih penjualan tertinggi pada produk kesehatan dan kecantikan (health_beauty). <br>
+Sales of the top product categories increased each year. However, the top-selling category was different each year. In 2018, the highest sales came from (health_beauty) category. <br>
 
 <p align="center">
   <kbd><img src="additional/total produk dibatalkan.jpg" width=600px> </kbd> <br>
-  Gambar 7. Grafik Total Top Produk yang Dibatalkan Pertahun
+  Picture 7. Chart of Total Top Cancelled Products per Year
 </p>
 
-Selain itu, produk yang sering dibatalkan pelanggan setiap tahunnya memiliki kategori yang berbeda dan terus meningkat. Pada tahun 2018 jumlah produk yang dibatalkan tertinggi berada dalam kategori yang sama dengan produk terlaris. Hal ini diduga karena kategori kesehatan dan kecantikan sedang mendominasi pasar. <br>
+The category with the most canceled orders also varied each year and showed an overall increase. In 2018, the category with the highest number of canceled products was also Health & Beauty, which was the top-selling category that year. This may indicate that the category had a high level of customer demand and activity. <br>
 
 ## 3. Annual Payment Type Usage
-Tipe pembayaran yang digunakan pelanggan dapat dianalisis dari jenis pembayaran favorit dan jumlah penggunaan untuk setiap jenis pembayaran pertahun. <br>
+Customer payment preferences can be analyzed by looking at the most frequently used payment methods and the number of transactions for each method each year. <br>
 
 <details>
   <summary>Click untuk melihat Queries</summary>
 
   ```sql
--- 1. Menampilkan jumlah penggunaan masing-masing tipe pembayaran secara all time diurutkan dari yang terfavorit
+-- 1. Displays the total usage count for each payment type (all-time), sorted by popularity
 select payment_type, count(1) as jumlah
 from order_payments_dataset
 group by 1
 order by 2 desc;
 
--- 2. Menampilkan detail informasi jumlah penggunaan masing-masing tipe pembayaran untuk setiap tahun
+-- 2. Displays detailed usage statistics for each payment type on a yearly basis
 select
 	payment_type,
 	sum(case when tahun = 2016 then total else 0 end) as "2016",
@@ -451,23 +451,23 @@ order by 2 desc;
 </details>
 
 <p align="center">
-Tabel 3. Hasil Analisis Tipe Pembayaran yang Digunakan Pelanggan <br>
+Tabel 3. Analysis of Payment Types Used by Customers <br>
   <kbd><img src="additional/Hasil Annual Payment Type Usage.jpg" width=600px> </kbd> <br>
 </p>
 
 <br>
 <p align="center">
   <kbd><img src="additional/tipe pembayaran pertahun.jpg" width=600px> </kbd> <br>
-  Gambar 8. Grafik Tipe Pembayaran yang Digunakan Pelanggan Pertahun
+  Picture 8. Chart of Payment Types Used by Customers (Yearly)
 </p>
 
-- Mayoritas pelanggan membayar dengan kartu kredit dan jumlahnya terus meningkat setiap tahun. Pembayaran dengan voucher meningkat pada tahun 2017 tetapi menurun pada tahun 2018. Hal ini diperkirakan karena  lebih sedikit voucher yang diterbitkan oleh perusahaan dibandingkan tahun sebelumnya. <br>
+- Credit cards were the most commonly used payment method, and their usage increased each year. <br>
 
-- Di sisi lain, jumlah pelanggan yang membayar dengan kartu debit meningkat secara signifikan di tahun 2018. Hal ini diduga karena kartu debit dapat memiliki diskon pembayaran sehingga banyak pelanggan yang tertarik dengan cara ini.  <br>
+- Vouchers became more popular in 2017 but declined in 2018. This may have been related to fewer vouchers being issued by the company compared to the previous year. <br>
 
-- Mayoritas pelanggan membayar dengan kartu kredit dan jumlahnya terus meningkat setiap tahun.
-Di sisi lain, jumlah pelanggan yang membayar dengan kartu bank meningkat secara signifikan di tahun 2018.
+- Debit card usage increased significantly in 2018. This may have been influenced by payment discounts or promotions available for debit card users, which could have encouraged more customers to use this payment method.<br>
 
+Overall credit cards remained the most popular payment method, while debit card usage showed significant growth in 2018.
 
 
 
